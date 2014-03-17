@@ -2,7 +2,7 @@
 #include <iomanip>     
 #include <stdlib.h>     
 #include <time.h>
-
+#include "process.h"
 using namespace std;
 
 // Given a min value, max value, a mean and the number of elements, generate a pseudo normal set of data. 
@@ -53,34 +53,6 @@ int getAverage(int* array, int length){
 	}
 
 	return average/length;
-}
-
-int main(){
-	
-	int num = 0;
-	cout << "Enter number of processes to create: ";
-	cin >> num;
-
-	struct proccess{
-		int id;
-		int cycles;
-		int memory;
-	} processes[num];
-	
-	int *cycles = new int[num];
-	int *memory = new int[num];
-	cycles = genNormalData(2500000, 1, 5000000, num);
-	memory = genNormalData(1000, .25, 4000, num);
-
-	for(int i = 0; i < num; i++){
-		processes[i].id = i;
-		processes[i].cycles = cycles[i];
-		processes[i].memory = memory[i];
-		cout << "Process id: " << processes[i].id << " cycles: " << processes[i].cycles << " memory: " << processes[i].memory << endl;
-	}
-
-	cout << "Average cycles: " << getAverage(cycles, num) << endl;
-	cout << "Average memory: "<< getAverage(memory, num) << endl;
 }
 
 

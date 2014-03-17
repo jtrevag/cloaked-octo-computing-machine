@@ -9,6 +9,6 @@ struct process{
 
 int getAverage(int*, int);
 int* genNormalData(int, int, int, int);
-int equalDistribution(process*);
+int equalDistribution(process*, int);
 
-#endif PROCESS_H
+#endif
