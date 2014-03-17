@@ -138,6 +138,145 @@ int sieveDistribution(process processes[], int size){
 
 }
 
+//Very poor implementation. Don't do this. Ever. 
+int limitedMemory (process processes[], int size) {
+	process* sortedProcesses = new process[size];
+	sortedProcesses = sortProcesses(processes, size); 
+
+	process processors[5][size];
+	int elementCount[5] = { 0 };
+	
+	int processorCount = 0;
+	for (int i = 0; i < size; i++) {
+		if (processorCount > 4)
+			processorCount = 0;
+		switch (processorCount) {
+			case (0): 
+				if (sortedProcesses[i].memory > 1000) { //If the process won't fit in this bucket, skip to the next bucket. 
+					i--;
+					processorCount++;
+					continue;
+				}
+				else
+					processors[processorCount][elementCount[processorCount]] = sortedProcesses[i];
+				break;
+			case (1):
+				if (sortedProcesses[i].memory > 1000) {
+					i--;
+					processorCount++;
+					continue;
+				}
+				else
+					processors[processorCount][elementCount[processorCount]] = sortedProcesses[i];
+				break;
+			case (2): 
+				if (sortedProcesses[i].memory > 2000) {
+					i--;
+					processorCount++;
+					continue;
+				}
+				else
+					processors[processorCount][elementCount[processorCount]] = sortedProcesses[i];
+				break;
+			case (3):
+				if (sortedProcesses[i].memory > 2000) {
+					i--;
+					processorCount++;
+					continue;
+				}
+				else
+					processors[processorCount][elementCount[processorCount]] = sortedProcesses[i];
+				break;
+			case (4):
+				processors[processorCount][elementCount[processorCount]] = sortedProcesses[i];
+				break;
+		}
+		elementCount[processorCount]++;
+		processorCount++;
+	}
+	
+	for (int i = 0; i < 5; i++) {
+		int total = 0;
+		for(int j = 0; j < elementCount[i]; j++){
+			total += processors[i][j].cycles;
+		}
+
+		cout << "The total for processor " << i << " is: " << total << endl;
+		total = 0;
+	}
+}
+
+//Places a process in whichever bucket it is allowed in which is ALSO the smallest size. Similar to sequential. 
+/*
+NOTES [Why I had trouble with this]
+The difficulty with this problem is distributing the processes evenly while ALSO putting them in allowed buckets. 
+Suppose there is a process distribution with very very few processes with memory > 2000. If I only put processes
+with mem > 2000 in the 4th processor, the cycle count will be too low. So I had to use a similar method to the one 
+found in sequentialDistribution to make sure that the processes are split evenly while also ensuring they are able to 
+run within memory requirements for that processor. 
+*/
+int restrictedMemory (process processes[], int size) {
+	process* sortedProcesses = new process[size];
+	sortedProcesses = sortProcesses(processes, size); 
+
+	process processors[5][size];
+	int processCount[5] = { 0 }; 
+	int elementCount[5] = { 0 };
+	
+	int mIndex = 0; //keeps track of the processor with the smallest number of cycles. 
+	int min = 0;
+	
+	int highMemCycles = 0; //Keeps track of cycles coming from processes with memory > 2000
+	
+	for (int i = size - 1; i >= 0; i--) {
+		if (sortedProcesses[i].memory > 2000) { //These processes MUST go in the last processor.
+			processors[4][elementCount[4]] = sortedProcesses[i];
+			elementCount[4]++;
+			processCount[4] += sortedProcesses[i].cycles;
+			highMemCycles += sortedProcesses[i].cycles;
+		}
+		else if (sortedProcesses[i].memory > 1000) {
+			min = processCount[2]; //Code block to find the smallest cycle count among processors 3-5
+			mIndex = 2;
+			for (int j = 2; j < 5; j++) {
+				if (processCount[j] < min) {
+					min = processCount[j];
+					mIndex = j;
+				}
+			}
+			
+			processors[mIndex][elementCount[mIndex]] = sortedProcesses[i];
+			elementCount[mIndex]++;
+			processCount[mIndex] += sortedProcesses[i].cycles;
+		}
+		else { //The process has memory < 1000
+			min = processCount[0]; //Code block to find the smallest cycle count among all processors. 
+			mIndex = 0;
+			for (int j = 0; j < 5; j++) {
+				if (processCount[j] < min) {
+					min = processCount[j];
+					mIndex = j;
+				}
+			}
+			
+			processors[mIndex][elementCount[mIndex]] = sortedProcesses[i];
+			elementCount[mIndex]++;
+			processCount[mIndex] += sortedProcesses[i].cycles;
+		}
+	}
+	
+	cout << "The number of cycles that MUST be in processor 4 is: " << highMemCycles << endl;
+	for (int i = 0; i < 5; i++) {
+		int total = 0;
+		for(int j = 0; j < elementCount[i]; j++){
+			total += processors[i][j].cycles;
+		}
+
+		cout << "The total for processor " << i << " is: " << total << endl;
+		total = 0;
+	}
+}
+
 int sequentialDistribution(process processes[], int size){
 	process processors[5][size];
 	processor totalCycles[5];
@@ -217,7 +356,8 @@ int main() {
 		processes[i].memory = memory[i];
 	}
 	
-	sequentialDistribution(processes, num);
+	restrictedMemory(processes, num);
+	//sequentialDistribution(processes, num);
 	//equalDistribution(processes, num);
 	
 	return 0;

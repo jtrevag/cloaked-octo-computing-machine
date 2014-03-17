@@ -18,6 +18,8 @@ int equalDistribution(process*, int);
 int listDistribution(process*, int);
 int pincerListDistribution(process*, int);
 int sieveDistribution(process*, int);
+int limitedMemory(process*, int);
+int restrictedMemory(process*, int);
 int sequentialDistribution(process*, int);
 
 process* sortProcesses(process*, int);
