@@ -1,5 +1,5 @@
 project: process.o scheduler.o
-	g++ process.o scheduler.o -O project.out
+	g++ process.o scheduler.o -o project.out
 process.o: process.cpp process.h
 	g++ -c process.cpp
 sceduler.o: scheduler.cpp process.h
