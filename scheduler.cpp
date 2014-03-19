@@ -25,11 +25,10 @@ int equalDistribution (process processes[], int size) {
 		cout << "Processor: " << i << " has " << limit << " cycles." << endl;
 	}
 	cout << count << endl;
-	
-};
+}
 
 //For each processor, take the next smalles and the next largest process based on number of cycles from each side of the process list and put it on that processor.
-int sequentialDistribution(process processes[], int size){
+int listDistribution(process processes[], int size){
 	process* sortedProcesses = new process[size];
 	sortedProcesses = sortProcesses(processes, size); 
 
@@ -59,11 +58,10 @@ int sequentialDistribution(process processes[], int size){
 		cout << "The total for processor " << i << " is: " << total << endl;
 		total = 0;
 	}
-
-};
+}
 
 //For each processor, take the next smalles and the next largest process based on number of cycles from each side of the process list and put it on that processor.
-int simultaneousSequentialDistribution(process processes[], int size){
+int pincerListDistribution(process processes[], int size){
 	process* sortedProcesses = new process[size];
 	sortedProcesses = sortProcesses(processes, size); 
 
@@ -94,7 +92,7 @@ int simultaneousSequentialDistribution(process processes[], int size){
 		total = 0;
 	}
 
-};
+}
 
 //For each processor, take the next smalles and the next largest process based on number of cycles from each side of the process list and put it on that processor.
 int sieveDistribution(process processes[], int size){
@@ -108,7 +106,6 @@ int sieveDistribution(process processes[], int size){
 	int forward = 1;
 	for(int i = 0; i<size; i++){
 		processors[processorCount][elementCount] = sortedProcesses[i];
-		cout << "Processor " << processorCount << " got a process with " << processors[processorCount][elementCount].cycles << " cycles." << endl;
 		if(forward){
 			processorCount++;
 		} else{
@@ -139,7 +136,46 @@ int sieveDistribution(process processes[], int size){
 		total = 0;
 	}
 
-};
+}
+
+int sequentialDistribution(process processes[], int size){
+	process processors[5][size];
+	processor totalCycles[5];
+	int smallest;
+	int processIndex;
+
+	for(int i = 0; i<size; i++){
+		//first 5 processes to come in are spread evenly among existing processes
+		if(i < 5){
+			processors[i][0] = processes[i];
+			totalCycles[i].countProcesses = 1;
+			totalCycles[i].totalCycles = processes[i].cycles;
+		}
+
+		else{
+			//find the processor with the least cycles
+			smallest = totalCycles[0].totalCycles;
+			processIndex = 0;
+			for(int j = 0; j < 5; j++){
+				if(smallest > totalCycles[j].totalCycles){
+					smallest = totalCycles[j].totalCycles;
+					processIndex = j;
+				}
+			}	
+
+			processors[processIndex][totalCycles[processIndex].countProcesses] = processes[i];
+			totalCycles[processIndex].countProcesses++;
+			totalCycles[processIndex].totalCycles += processes[i].cycles;
+
+		}
+
+	}
+
+	for(int i = 0; i < 5; i++){
+		cout << "Processor " << i << " has a total of " << totalCycles[i].countProcesses << " processes, with " << totalCycles[i].totalCycles << " total cycles." << endl;
+	}
+
+}
 
 process* sortProcesses(process processes[], int size){
 	process swap;
@@ -158,13 +194,13 @@ process* sortProcesses(process processes[], int size){
   	}
 
   	return processes;
-};
+}
 
 void printProcesses(process processes[], int size){
 	for(int i = 0; i < size; i++){
 		cout << "Process " << i << " has " << processes[i].cycles << " cycles, and " << processes[i].memory << " memory." << endl;
 	}
-};
+}
 
 int main() {
 	int num = 100;
@@ -181,7 +217,7 @@ int main() {
 		processes[i].memory = memory[i];
 	}
 	
-	trevDistribution3(processes, num);
+	sequentialDistribution(processes, num);
 	//equalDistribution(processes, num);
 	
 	return 0;

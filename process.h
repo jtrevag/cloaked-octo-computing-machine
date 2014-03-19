@@ -7,11 +7,19 @@ struct process{
 		int memory;
 }; 
 
+struct processor{
+	int countProcesses;
+	int totalCycles;
+};
+
 int getAverage(int*, int);
 int* genNormalData(int, int, int, int);
 int equalDistribution(process*, int);
-int trevDistribution(process*, int);
-int trevDistribution2(process*, int);
+int listDistribution(process*, int);
+int pincerListDistribution(process*, int);
+int sieveDistribution(process*, int);
+int sequentialDistribution(process*, int);
+
 process* sortProcesses(process*, int);
 void printProcesses(process*, int);
 
