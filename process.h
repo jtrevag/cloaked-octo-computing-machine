@@ -10,6 +10,7 @@ struct process{
 struct processor{
 	int countProcesses;
 	int totalCycles;
+	int adjustedCycles;
 };
 
 int getAverage(int*, int);

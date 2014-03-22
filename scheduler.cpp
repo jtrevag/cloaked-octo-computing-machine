@@ -275,6 +275,56 @@ int restrictedMemory (process processes[], int size) {
 		cout << "The total for processor " << i << " is: " << total << endl;
 		total = 0;
 	}
+}	
+
+int limitedSpeed (process processes[], int size) {
+	process* sortedProcesses = new process[size];
+	sortedProcesses = sortProcesses(processes, size); 
+
+	//Structure to hold the total number of cycles and adjusted number of cycles for each processor.
+	processor processors[5];
+	for(int i = 0; i < 5; i++){
+		processors[i].totalCycles =0;
+		processors[i].countProcesses=0;
+		processors[i].adjustedCycles=0;
+	}
+
+	
+	for(int i = 99; i>=0; i--){
+		//find processor with minimum
+		int procIndexMin = 0;
+		for(int j = 0; j < 5; j++){
+			if(processors[procIndexMin].adjustedCycles > processors[j].adjustedCycles){
+				procIndexMin = j;
+			}
+		}
+	
+		processors[procIndexMin].totalCycles += sortedProcesses[i].cycles;
+		processors[procIndexMin].countProcesses++;
+		switch(procIndexMin){
+			case(0):
+				processors[procIndexMin].adjustedCycles +=  (2 * sortedProcesses[i].cycles);
+				break;
+			case(1):
+				processors[procIndexMin].adjustedCycles +=  (2 * sortedProcesses[i].cycles);
+				break;
+			case(2):
+				processors[procIndexMin].adjustedCycles +=  (1 * sortedProcesses[i].cycles);
+				break;
+			case(3):
+				processors[procIndexMin].adjustedCycles +=  (1 * sortedProcesses[i].cycles);
+				break;
+			default:
+				processors[procIndexMin].adjustedCycles +=  (0.5 * sortedProcesses[i].cycles);
+				break;
+		}
+	}
+	
+	
+	for(int i = 0; i < 5; i++){
+		cout << "Processor " << i << " has a total of " << processors[i].countProcesses << " processes, with " << processors[i].totalCycles << " total cycles and " << processors[i].adjustedCycles << " adjusted cycles." << endl;
+	}
+
 }
 
 int sequentialDistribution(process processes[], int size){
@@ -356,9 +406,15 @@ int main() {
 		processes[i].memory = memory[i];
 	}
 	
+	cout << "With unlimited resources" << endl;
+	sieveDistribution(processes, num);
+	cout << "With processor memory limited" << endl;
 	restrictedMemory(processes, num);
-	//sequentialDistribution(processes, num);
-	//equalDistribution(processes, num);
+	cout << "With processor speed limited" << endl;
+	limitedSpeed(processes,num);
+	cout << "With processes being entered into the system sequentially" << endl;
+	sequentialDistribution(processes, num);
+
 	
 	return 0;
 }
