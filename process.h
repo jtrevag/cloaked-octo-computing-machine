@@ -8,9 +8,14 @@ struct process{
 }; 
 
 struct processor{
+	process* processList;
 	int countProcesses;
 	int totalCycles;
 	int adjustedCycles;
+	int* waitTime;
+	int* turnaroundTime;
+	int avgWait;
+	int avgTurn;
 };
 
 int getAverage(int*, int);

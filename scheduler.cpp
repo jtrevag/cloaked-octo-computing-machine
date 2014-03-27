@@ -265,6 +265,16 @@ int restrictedMemory (process processes[], int size) {
 		}
 	}
 	
+	processor processorList[5];
+	for(int i = 0; i < 5; i++){
+		processorList[i].totalCycles = 0;
+		processorList[i].countProcesses=0;
+		processorList[i].adjustedCycles=0;
+		processorList[i].avgWait = 0;
+		processorList[i].avgTurn = 0;
+		processorList[i].processList = new process[size];
+	}
+	
 	cout << "The number of cycles that MUST be in processor 4 is: " << highMemCycles << endl;
 	for (int i = 0; i < 5; i++) {
 		int total = 0;
@@ -287,6 +297,9 @@ int limitedSpeed (process processes[], int size) {
 		processors[i].totalCycles =0;
 		processors[i].countProcesses=0;
 		processors[i].adjustedCycles=0;
+		processors[i].avgWait = 0;
+		processors[i].avgTurn = 0;
+		processors[i].processList = new process[size];
 	}
 
 	
@@ -300,6 +313,7 @@ int limitedSpeed (process processes[], int size) {
 		}
 	
 		processors[procIndexMin].totalCycles += sortedProcesses[i].cycles;
+		processors[procIndexMin].processList[processors[procIndexMin].countProcesses] = sortedProcesses[i];
 		processors[procIndexMin].countProcesses++;
 		switch(procIndexMin){
 			case(0):
@@ -320,9 +334,55 @@ int limitedSpeed (process processes[], int size) {
 		}
 	}
 	
+	//Sorts the processes to reduce the total waiting time. This reduces the average wait time by about 5000 seconds. 
+	for (int i = 0; i < 5; i++) {
+		processors[i].processList = sortProcesses(processors[i].processList, processors[i].countProcesses);
+		processors[i].waitTime = new int[processors[i].countProcesses];
+		processors[i].turnaroundTime = new int[processors[i].countProcesses];
+	}
+
+	//This monstrous block of code is for determining the wait time and turnaround time for each process. 
+	for (int i = 0; i < 5; i++) {
+		int totalWait = 0;
+		int totalTurn = 0;
+		processors[i].waitTime[0] = 0;
+		processors[i].turnaroundTime[0] = processors[i].processList[0].cycles / 1000;
+		totalTurn += processors[i].turnaroundTime[0];
+		for (int j = 1; j < processors[i].countProcesses; j++) {
+			switch (i) {
+				case (0):
+					processors[i].waitTime[j] = processors[i].waitTime[j-1] + (processors[i].processList[j - 1].cycles / 1000);
+					processors[i].turnaroundTime[j] = processors[i].turnaroundTime[j-1] + (processors[i].processList[j].cycles / 1000);
+					break;
+				case (1):
+					processors[i].waitTime[j] = processors[i].waitTime[j-1] + (processors[i].processList[j - 1].cycles / 1000);
+					processors[i].turnaroundTime[j] = processors[i].turnaroundTime[j-1] + (processors[i].processList[j].cycles / 1000);
+					break;
+				case (2):
+					processors[i].waitTime[j] = processors[i].waitTime[j-1] + (processors[i].processList[j - 1].cycles / 2000);
+					processors[i].turnaroundTime[j] = processors[i].turnaroundTime[j-1] + (processors[i].processList[j].cycles / 2000);
+					break;
+				case (3):
+					processors[i].waitTime[j] = processors[i].waitTime[j-1] + (processors[i].processList[j - 1].cycles / 2000);
+					processors[i].turnaroundTime[j] = processors[i].turnaroundTime[j-1] + (processors[i].processList[j].cycles / 2000);
+					break;
+				case (4):
+					processors[i].waitTime[j] = processors[i].waitTime[j-1] + (processors[i].processList[j - 1].cycles / 4000);
+					processors[i].turnaroundTime[j] = processors[i].turnaroundTime[j-1] + (processors[i].processList[j].cycles / 4000);
+					break;
+			}
+			// processors[i].waitTime[j] = processors[i].waitTime[j-1] + (processors[i].processList[j - 1].cycles / 4000);
+			// processors[i].turnaroundTime[j] = processors[i].turnaroundTime[j-1] + (processors[i].processList[j].cycles / 4000);
+			totalWait += processors[i].waitTime[j];
+			totalTurn += processors[i].turnaroundTime[j];
+		}
+		processors[i].avgWait = totalWait / processors[i].countProcesses;
+		processors[i].avgTurn = totalTurn / processors[i].countProcesses;
+	}
 	
 	for(int i = 0; i < 5; i++){
 		cout << "Processor " << i << " has a total of " << processors[i].countProcesses << " processes, with " << processors[i].totalCycles << " total cycles and " << processors[i].adjustedCycles << " adjusted cycles." << endl;
+		cout << "with an average waiting time of: " << processors[i].avgWait << " and average turnaround time: " << processors[i].avgTurn << endl;
 	}
 
 }
@@ -406,14 +466,14 @@ int main() {
 		processes[i].memory = memory[i];
 	}
 	
-	cout << "With unlimited resources" << endl;
-	sieveDistribution(processes, num);
-	cout << "With processor memory limited" << endl;
-	restrictedMemory(processes, num);
+	// cout << "With unlimited resources" << endl;
+	// sieveDistribution(processes, num);
+	// cout << "With processor memory limited" << endl;
+	// restrictedMemory(processes, num);
 	cout << "With processor speed limited" << endl;
 	limitedSpeed(processes,num);
-	cout << "With processes being entered into the system sequentially" << endl;
-	sequentialDistribution(processes, num);
+	// cout << "With processes being entered into the system sequentially" << endl;
+	// sequentialDistribution(processes, num);
 
 	
 	return 0;
