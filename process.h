@@ -16,6 +16,7 @@ struct processor{
 	int* turnaroundTime;
 	int avgWait;
 	int avgTurn;
+	int runtime;
 };
 
 int getAverage(int*, int);

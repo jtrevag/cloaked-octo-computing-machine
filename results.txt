@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+With unlimited resources
+Processor 0
+Total runtime: 12138s	Avg Wait Time: 4484s	Avg Turnaround Time: 5091s
+Processor 1
+Total runtime: 12042s	Avg Wait Time: 4495s	Avg Turnaround Time: 5097s
+Processor 2
+Total runtime: 12057s	Avg Wait Time: 4495s	Avg Turnaround Time: 5098s
+Processor 3
+Total runtime: 12039s	Avg Wait Time: 4484s	Avg Turnaround Time: 5086s
+Processor 4
+Total runtime: 12026s	Avg Wait Time: 4481s	Avg Turnaround Time: 5082s
+---------------------------------------------------------------------------
+With processor memory limited
+Processor 0
+Total runtime: 11915s	Avg Wait Time: 4636s	Avg Turnaround Time: 5178s
+Processor 1
+Total runtime: 11904s	Avg Wait Time: 4623s	Avg Turnaround Time: 5164s
+Processor 2
+Total runtime: 11852s	Avg Wait Time: 4583s	Avg Turnaround Time: 5147s
+Processor 3
+Total runtime: 12037s	Avg Wait Time: 4566s	Avg Turnaround Time: 5112s
+Processor 4
+Total runtime: 12594s	Avg Wait Time: 5559s	Avg Turnaround Time: 6528s
+---------------------------------------------------------------------------
+With processor speed limited
+Processor 0
+Total runtime: 24479s	Avg Wait Time: 8310s	Avg Turnaround Time: 10304s
+Processor 1
+Total runtime: 24503s	Avg Wait Time: 8556s	Avg Turnaround Time: 10556s
+Processor 2
+Total runtime: 24078s	Avg Wait Time: 8990s	Avg Turnaround Time: 10194s
+Processor 3
+Total runtime: 24091s	Avg Wait Time: 8999s	Avg Turnaround Time: 10203s
+Processor 4
+Total runtime: 23973s	Avg Wait Time: 9231s	Avg Turnaround Time: 10030s
+---------------------------------------------------------------------------
+With processes being entered into the system sequentially
+Processor 0
+Total runtime: 11728s	Avg Wait Time: 4329s	Avg Turnaround Time: 4915s
+Processor 1
+Total runtime: 11905s	Avg Wait Time: 4419s	Avg Turnaround Time: 5013s
+Processor 2
+Total runtime: 12057s	Avg Wait Time: 4495s	Avg Turnaround Time: 5098s
+Processor 3
+Total runtime: 12177s	Avg Wait Time: 4561s	Avg Turnaround Time: 5169s
+Processor 4
+Total runtime: 12436s	Avg Wait Time: 4636s	Avg Turnaround Time: 5257s
