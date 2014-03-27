@@ -99,13 +99,24 @@ int sieveDistribution(process processes[], int size){
 	process* sortedProcesses = new process[size];
 	sortedProcesses = sortProcesses(processes, size); 
 
-	process processors[5][size];
+	processor processorList[5];
+
+	for(int i = 0; i < 5; i++){
+		processorList[i].totalCycles =0;
+		processorList[i].countProcesses=0;
+		processorList[i].avgWait = 0;
+		processorList[i].avgTurn = 0;
+		processorList[i].processList = new process[size];
+	}
 	
 	int processorCount = 0;
 	int elementCount = 0;
 	int forward = 1;
 	for(int i = 0; i<size; i++){
-		processors[processorCount][elementCount] = sortedProcesses[i];
+		processorList[processorCount].processList[elementCount] = sortedProcesses[i];
+		processorList[processorCount].totalCycles += sortedProcesses[i].cycles;
+		processorList[processorCount].countProcesses++;
+		// processors[processorCount][elementCount] = sortedProcesses[i];
 		if(forward){
 			processorCount++;
 		} else{
@@ -124,16 +135,34 @@ int sieveDistribution(process processes[], int size){
 		}
 	}
 
-	cout << elementCount << endl;
-
-	for(int i = 0; i < 5; i++){
-		int total = 0;
-		for(int j = 0; j < elementCount; j++){
-			total += processors[i][j].cycles;
+	
+	//Sorts the processes to reduce the total waiting time. This reduces the average wait time by about 5000 seconds. 
+	for (int i = 0; i < 5; i++) {
+		processorList[i].processList = sortProcesses(processorList[i].processList, processorList[i].countProcesses);
+		processorList[i].waitTime = new int[processorList[i].countProcesses];
+		processorList[i].turnaroundTime = new int[processorList[i].countProcesses];
+	}
+	
+	//Finds the total and average for wait and turnaround time. 
+	for (int i = 0; i < 5; i++) {
+		int totalWait = 0;
+		int totalTurn = 0;
+		processorList[i].waitTime[0] = 0;
+		processorList[i].turnaroundTime[0] = processorList[i].processList[0].cycles / 4000;
+		totalTurn += processorList[i].turnaroundTime[0];
+		for (int j = 1; j < processorList[i].countProcesses; j++) {
+			processorList[i].waitTime[j] = processorList[i].waitTime[j-1] + (processorList[i].processList[j - 1].cycles / 4000);
+			processorList[i].turnaroundTime[j] = processorList[i].turnaroundTime[j-1] + (processorList[i].processList[j].cycles / 4000);
+			totalWait += processorList[i].waitTime[j];
+			totalTurn += processorList[i].turnaroundTime[j];
 		}
-
-		cout << "The total for processor " << i << " is: " << total << endl;
-		total = 0;
+		processorList[i].avgWait = totalWait / processorList[i].countProcesses;
+		processorList[i].avgTurn = totalTurn / processorList[i].countProcesses;
+	}
+	
+	for(int i = 0; i < 5; i++){
+		cout << "Processor " << i << " has a total of " << processorList[i].countProcesses << " processes, with " << processorList[i].totalCycles << " total cycles." <<  endl;
+		cout << "with an average waiting time of: " << processorList[i].avgWait << " and average turnaround time: " << processorList[i].avgTurn << endl;
 	}
 
 }
@@ -290,7 +319,7 @@ int restrictedMemory (process processes[], int size) {
 		int totalWait = 0;
 		int totalTurn = 0;
 		processorList[i].waitTime[0] = 0;
-		processorList[i].turnaroundTime[0] = processorList[i].processList[0].cycles / 1000;
+		processorList[i].turnaroundTime[0] = processorList[i].processList[0].cycles / 4000;
 		totalTurn += processorList[i].turnaroundTime[0];
 		for (int j = 1; j < processorList[i].countProcesses; j++) {
 			processorList[i].waitTime[j] = processorList[i].waitTime[j-1] + (processorList[i].processList[j - 1].cycles / 4000);
@@ -367,7 +396,7 @@ int limitedSpeed (process processes[], int size) {
 		int totalWait = 0;
 		int totalTurn = 0;
 		processors[i].waitTime[0] = 0;
-		processors[i].turnaroundTime[0] = processors[i].processList[0].cycles / 1000;
+		processors[i].turnaroundTime[0] = processors[i].processList[0].cycles / 2000;
 		totalTurn += processors[i].turnaroundTime[0];
 		for (int j = 1; j < processors[i].countProcesses; j++) {
 			switch (i) {
@@ -409,40 +438,74 @@ int limitedSpeed (process processes[], int size) {
 }
 
 int sequentialDistribution(process processes[], int size){
-	process processors[5][size];
-	processor totalCycles[5];
+	processor processorList[5];
 	int smallest;
 	int processIndex;
+
+	for(int i = 0; i < 5; i++){
+		processorList[i].totalCycles =0;
+		processorList[i].countProcesses=0;
+		processorList[i].avgWait = 0;
+		processorList[i].avgTurn = 0;
+		processorList[i].processList = new process[size];
+	}
 
 	for(int i = 0; i<size; i++){
 		//first 5 processes to come in are spread evenly among existing processes
 		if(i < 5){
-			processors[i][0] = processes[i];
-			totalCycles[i].countProcesses = 1;
-			totalCycles[i].totalCycles = processes[i].cycles;
+			processorList[i].countProcesses = 1;
+			processorList[i].totalCycles = processes[i].cycles;
+			processorList[i].processList[0] = processes[i];
 		}
+
+
 
 		else{
 			//find the processor with the least cycles
-			smallest = totalCycles[0].totalCycles;
+			smallest = processorList[0].totalCycles;
 			processIndex = 0;
 			for(int j = 0; j < 5; j++){
-				if(smallest > totalCycles[j].totalCycles){
-					smallest = totalCycles[j].totalCycles;
+				if(smallest > processorList[j].totalCycles){
+					smallest = processorList[j].totalCycles;
 					processIndex = j;
 				}
 			}	
 
-			processors[processIndex][totalCycles[processIndex].countProcesses] = processes[i];
-			totalCycles[processIndex].countProcesses++;
-			totalCycles[processIndex].totalCycles += processes[i].cycles;
-
+			processorList[processIndex].processList[processorList[processIndex].countProcesses] = processes[i];
+			processorList[processIndex].countProcesses++;
+			processorList[processIndex].totalCycles += processes[i].cycles;
+			
 		}
 
 	}
 
+	
+	//Sets up wait time and turnaroud time arrays for each set of processes on each processor. 
+	for (int i = 0; i < 5; i++) {
+		processorList[i].waitTime = new int[processorList[i].countProcesses];
+		processorList[i].turnaroundTime = new int[processorList[i].countProcesses];
+	}
+	
+	//Finds the total and average for wait and turnaround time. 
+	for (int i = 0; i < 5; i++) {
+		int totalWait = 0;
+		int totalTurn = 0;
+		processorList[i].waitTime[0] = 0;
+		processorList[i].turnaroundTime[0] = processorList[i].processList[0].cycles / 4000;
+		totalTurn += processorList[i].turnaroundTime[0];
+		for (int j = 1; j < processorList[i].countProcesses; j++) {
+			processorList[i].waitTime[j] = processorList[i].waitTime[j-1] + (processorList[i].processList[j - 1].cycles / 4000);
+			processorList[i].turnaroundTime[j] = processorList[i].turnaroundTime[j-1] + (processorList[i].processList[j].cycles / 4000);
+			totalWait += processorList[i].waitTime[j];
+			totalTurn += processorList[i].turnaroundTime[j];
+		}
+		processorList[i].avgWait = totalWait / processorList[i].countProcesses;
+		processorList[i].avgTurn = totalTurn / processorList[i].countProcesses;
+	}
+	
 	for(int i = 0; i < 5; i++){
-		cout << "Processor " << i << " has a total of " << totalCycles[i].countProcesses << " processes, with " << totalCycles[i].totalCycles << " total cycles." << endl;
+		cout << "Processor " << i << " has a total of " << processorList[i].countProcesses << " processes, with " << processorList[i].totalCycles << " total cycles." << endl;
+		cout << "with an average waiting time of: " << processorList[i].avgWait << " and average turnaround time: " << processorList[i].avgTurn << endl;
 	}
 
 }
@@ -487,14 +550,14 @@ int main() {
 		processes[i].memory = memory[i];
 	}
 	
-	// cout << "With unlimited resources" << endl;
-	// sieveDistribution(processes, num);
+	cout << "With unlimited resources" << endl;
+	sieveDistribution(processes, num);
 	cout << "With processor memory limited" << endl;
 	restrictedMemory(processes, num);
-	// cout << "With processor speed limited" << endl;
-	// limitedSpeed(processes,num);
-	// cout << "With processes being entered into the system sequentially" << endl;
-	// sequentialDistribution(processes, num);
+	cout << "With processor speed limited" << endl;
+	limitedSpeed(processes,num);
+	cout << "With processes being entered into the system sequentially" << endl;
+	sequentialDistribution(processes, num);
 
 	
 	return 0;
